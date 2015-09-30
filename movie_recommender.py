@@ -30,6 +30,8 @@ def calculate_gradient(X_and_theta, ratings, did_rate, num_users, num_movies, nu
 	
 	# we multiply by did_rate because we only want to consider observations for which a rating was given
 	difference = X.dot( theta.T ) * did_rate - ratings
+	
+	# we calculate the gradients (derivatives) of the cost with respect to X and theta
 	X_grad = difference.dot( theta ) + reg_param * X
 	theta_grad = difference.T.dot( X ) + reg_param * theta
 	
@@ -50,7 +52,11 @@ def calculate_cost(X_and_theta, ratings, did_rate, num_users, num_movies, num_fe
 	theta = last_18.reshape(num_features, num_users ).transpose()
 	
 	# we multiply by did_rate because we only want to consider observations for which a rating was given
+	# we calculate the sum of squared errors here.  
+	# in other words, we calculate the squared difference between our hypothesis (predictions) and ratings
 	cost = sum( (X.dot( theta.T ) * did_rate - ratings) ** 2 ) / 2
+	
+	# we get the sum of the square of every element of X and theta
 	regularization = (reg_param / 2) * (sum( theta**2 ) + sum(X**2))
 	return cost + regularization
 	
