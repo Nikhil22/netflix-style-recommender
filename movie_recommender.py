@@ -16,6 +16,7 @@ def normalize_ratings(ratings, did_rate):
 		
 	return (ratings_norm, ratings_mean)
 
+
 def calculate_gradient(X_and_theta, ratings, did_rate, num_users, num_movies, num_features, reg_param):
 	# Retrieve the X and theta matrixes from X_and_theta, based on their dimensions (num_features, num_movies, num_movies)
 	# --------------------------------------------------------------------------------------------------------------
@@ -30,8 +31,6 @@ def calculate_gradient(X_and_theta, ratings, did_rate, num_users, num_movies, nu
 	
 	# we multiply by did_rate because we only want to consider observations for which a rating was given
 	difference = X.dot( theta.T ) * did_rate - ratings
-	
-	# we calculate the gradients (derivatives) of the cost with respect to X and theta
 	X_grad = difference.dot( theta ) + reg_param * X
 	theta_grad = difference.T.dot( X ) + reg_param * theta
 	
@@ -51,12 +50,9 @@ def calculate_cost(X_and_theta, ratings, did_rate, num_users, num_movies, num_fe
 	# Reshape this column vector into a 6 X 3 matrix
 	theta = last_18.reshape(num_features, num_users ).transpose()
 	
-	# we multiply by did_rate because we only want to consider observations for which a rating was given
-	# we calculate the sum of squared errors here.  
-	# in other words, we calculate the squared difference between our hypothesis (predictions) and ratings
+	# we multiply (element-wise) by did_rate because we only want to consider observations for which a rating was given
 	cost = sum( (X.dot( theta.T ) * did_rate - ratings) ** 2 ) / 2
-	
-	# we get the sum of the square of every element of X and theta
+	# '**' means an element-wise power
 	regularization = (reg_param / 2) * (sum( theta**2 ) + sum(X**2))
 	return cost + regularization
 	
@@ -155,7 +151,7 @@ did_rate = append(((nikhil_ratings != 0) * 1), did_rate, axis = 1)
 '''
 
 # Normalize ratings
-ratings_norm, ratings_mean = normalize_ratings(ratings, did_rate)
+ratings, ratings_mean = normalize_ratings(ratings, did_rate)
 
 # Here's what the normalized ratings matrix looks like
 '''
@@ -217,6 +213,13 @@ all_predictions = movie_features.dot( user_prefs.T )
 
 # get my predictions by extracting the first column vector from all_predictions
 # add back the mean 
+'''this is the type of syntax, ([:, 0:1], that we want; causes rows to stack onto one another, so we get: 
+	array([
+		[value],
+		[value],
+		etc
+		])
+'''
 predictions_for_nikhil = all_predictions[:, 0:1] + ratings_mean
 
 # we use argsort . we cannot simply use sort(predictions_for_nikhil)
@@ -230,18 +233,19 @@ all_movies = loadMovies()
 for i in range(num_movies):
 		# grab index (integer), which remember, are all sorted based on the prediction values 
 		index = sorted_indexes[i, 0]
-		print "Predicting rating %.1f for movie %s" % (predictions_for_nikhil[index], all_movies[index])
+		print "Predicted rating %.1f for %s" % (predictions_for_nikhil[index], all_movies[index])
 		
 # Here's the result
 '''
-Predicting rating 7.4 for movie A Very Harold and Kumar Christmas (2011)
-Predicting rating 8.0 for movie Straight Outta Compton (2011)
-Predicting rating 6.7 for movie Notorious (2009)
-Predicting rating 8.1 for movie Ted (2012)
-Predicting rating 4.4 for movie Cinderella (2015)
-Predicting rating 4.0 for movie Toy Story 3 (2010)
-Predicting rating 6.1 for movie Frozen (2013)
-Predicting rating 9.8 for movie Harold and Kumar Escape From Guantanamo Bay (2008)
-Predicting rating 5.8 for movie Tangled (2010)
-Predicting rating 6.6 for movie Get Rich Or Die Tryin' (2005)
+Predicted rating 7.4 for A Very Harold and Kumar Christmas (2011)
+Predicted rating 8.0 for Straight Outta Compton (2011)
+Predicted rating 6.7 for Notorious (2009)
+Predicted rating 8.1 for Ted (2012)
+Predicted rating 4.4 for Cinderella (2015)
+Predicted rating 4.0 for Toy Story 3 (2010)
+Predicted rating 6.1 for Frozen (2013)
+Predicted rating 9.8 for Harold and Kumar Escape From Guantanamo Bay (2008)
+Predicted rating 5.8 for Tangled (2010)
+Predicted rating 6.6 for Get Rich Or Die Tryin' (2005)
 '''
+
